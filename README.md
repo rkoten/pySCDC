@@ -15,5 +15,9 @@ Decode folder will contain 255 copies of original text if worked correctly, each
 ### Script is pretty weakly tested, TODO: properly unit test it.
 
 For more theoretical information, please refer to:
+
 https://www.dcc.uchile.cl/~gnavarro/ps/spire03.4.pdf
+
 https://pdfs.semanticscholar.org/62de/373af61cc71854f86028554a988f8a4dbe36.pdf
+
+http://vios.dc.fi.udc.es/codes/semistatic.html

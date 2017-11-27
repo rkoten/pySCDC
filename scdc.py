@@ -31,13 +31,14 @@ def scdc_encode(s):
     """
     SCDC encode text.
     :param s: s parameter for scdc
-    :return: encoded text - list
+    :return: wall execution time in seconds, encoded bytes size
     """
+    start = default_timer()
+
     c = 256 - s
     out = b''
     global text, split, vocab
-    if split is None:  # might have already split the text on generate_vocab()
-        split = findall(PATTERN, text)
+
     for item in split:
         if item == ' ':
             i = vocab.index('%space%')
@@ -52,15 +53,18 @@ def scdc_encode(s):
             cur += (x % c).to_bytes(1, 'big')
             x //= c
         out += cur[::-1]
-    return out
+
+    with open(join(ENCODE_DIR, CODE_FILE % s), 'wb') as file_out:
+        file_out.write(out)
+
+    return default_timer() - start, len(out)
 
 
-def scdc_decode(code, s):
+def scdc_decode(s):
     """
     Decode SCDC encoded text.
-    :param code: encoded text
     :param s: s parameter for scdc
-    :return: decoded text - list
+    :return: wall execution time in seconds
     """
 
     def generate_base():
@@ -79,6 +83,30 @@ def scdc_decode(code, s):
             yield prev
             cc *= cc
 
+    def write_decode(text):
+        """
+        Write decode result to corresponding file.
+        :param text: decoded text
+        :return: None
+        """
+        with open(join(DECODE_DIR, CODE_FILE % s), 'w', encoding='utf-8') as file_out:
+            for item in text:
+                if item == '%space%':
+                    file_out.write(' ')
+                elif item == '%newline%':
+                    file_out.write('\n')
+                else:
+                    file_out.write(item)
+
+    start = default_timer()
+
+    filename = join(ENCODE_DIR, CODE_FILE % s)
+    if not isfile(filename):
+        print("file '%s' not found for decoding" % filename)
+        return None
+    with open(filename, 'rb') as file_in:
+        code = file_in.read()
+
     c = 256 - s
     global vocab
     out = []  # decoded text
@@ -96,12 +124,14 @@ def scdc_decode(code, s):
             # reset these before moving to next byte sequence
             cur = 0
             base = generate_base()
-    return out
+
+    write_decode(out)
+    return default_timer() - start
 
 
-def parse_text():
+def scdc_prepare():
     """
-    Read text from file, split it, and get vocabulary (unique words) for it.
+    Create required directories, read text from file, split the text, and get vocabulary (unique words) for it.
     :return: None
     """
 
@@ -158,83 +188,17 @@ def parse_text():
     else:
         generate_vocab()
 
-
-def print_decode(decode, s):
-    """
-    Print decoded text.
-    :param decode: decoded text
-    :param s: scdc s parameter to determine file to print to
-    :return: None
-    """
-    with open(join(DECODE_DIR, CODE_FILE % s), 'w', encoding='utf-8') as file_out:
-        for item in decode:
-            if item == '%space%':
-                file_out.write(' ')
-            elif item == '%newline%':
-                file_out.write('\n')
-            else:
-                file_out.write(item)
+    for dir in (ENCODE_DIR, DECODE_DIR):
+        if not isdir(dir):
+            makedirs(dir)
 
 
-def run_decode():
-    """
-    Start decode procedure.
-    :return: decoding times for each s parameter - list
-    """
-    global vocab
-    if not isdir(ENCODE_DIR):
-        print('Encoded files not found, stopping.')
-        exit(0)
-    if not isdir(DECODE_DIR):
-        makedirs(DECODE_DIR)
-
-    times = []
-    for s in range(1, 256):
-        print('decoding, s =', s)
-        with open(join(ENCODE_DIR, CODE_FILE % s), 'rb') as file_in:
-            code = file_in.read()
-
-        start = default_timer()
-        decode = scdc_decode(code, s)
-        time = default_timer() - start
-
-        times.append(time)
-        print('time:', time)
-        print_decode(decode, s)
-        print()
-
-    return times
-
-
-def run_encode():
-    """
-    Start encoding procedure.
-    :return: encoding sizes & times for each s parameter - (list of tuples)
-    """
-    if not isdir(ENCODE_DIR):
-        makedirs(ENCODE_DIR)
-    global text, vocab
-
-    results = []
-    for s in range(1, 256):
-        print('encoding, s =', s)
-
-        start = default_timer()
-        code = scdc_encode(s)
-        with open(join(ENCODE_DIR, CODE_FILE % s), 'wb') as file_out:
-            file_out.write(code)
-        time = default_timer() - start
-        size = len(code)
-
-        results.append((size, time))
-        print('time:', time)
-        print('size:', size)
-        print()
-
-    return results
+def main():
+    scdc_prepare()
+    for f in (scdc_encode, scdc_decode):
+        for s in range(1, 256):
+            print(f(s))
 
 
 if __name__ == '__main__':
-    parse_text()
-    print(run_encode())
-    print(run_decode())
+    main()
