@@ -1,7 +1,6 @@
 """
-For more theoretical information, please refer to:
-https://www.dcc.uchile.cl/~gnavarro/ps/spire03.4.pdf
-https://pdfs.semanticscholar.org/62de/373af61cc71854f86028554a988f8a4dbe36.pdf
+S,C-dense coding in Python 3
+Please refer to readme for theoretical information.
 
 Roman Kotenko, 2017
 """
@@ -114,14 +113,17 @@ def scdc_decode(s):
     cur = 0  # index in vocabulary of item represented by current byte sequence
     base = generate_base()
     for x in code:
-        if x < c:  # non-stopping byte
+        if x < c:
+            # This is a non-stopping byte.
             cur = cur * c + x
-            next(base)  # with each non-stopping byte just move on to next base value
-            # so that we have the value we need when the stopping byte is hit
-        else:  # we hit stopping byte in the sequence
+            # With each non-stopping byte just move on to next base value,
+            # so that we have the value we need when the stopping byte is hit.
+            next(base)
+        else:
+            # We hit stopping byte in the sequence.
             cur = cur * s + x - c + next(base)
             out.append(vocab[cur])
-            # reset these before moving to next byte sequence
+            # Reset these before moving to next byte sequence.
             cur = 0
             base = generate_base()
 
@@ -180,7 +182,7 @@ def scdc_prepare():
             vocab = []
             for line in file_in:
                 vocab.append(line.rstrip())
-            # compare md5 of TEXT_FILE and the file vocab was compiled for
+            # Compare md5 of TEXT_FILE and the file vocab was compiled for.
             if vocab[0] == md5hash:
                 del vocab[0]
             else:
@@ -193,12 +195,8 @@ def scdc_prepare():
             makedirs(dir)
 
 
-def main():
+if __name__ == '__main__':
     scdc_prepare()
     for f in (scdc_encode, scdc_decode):
         for s in range(1, 256):
             print(f(s))
-
-
-if __name__ == '__main__':
-    main()
