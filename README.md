@@ -12,6 +12,6 @@ Decode folder will contain 255 copies of original text if worked correctly, each
 *Script is weakly tested, consider it a sample implementation.*
 
 ### References
-* (S,C)-Dense Coding: An Optimized Compression Code for Natural Language Text Databases (by Brisaboa, Fariña et al.; [link](https://www.dcc.uchile.cl/~gnavarro/ps/spire03.4.pdf)).
-* On the Usefulness of Fibonacci Compression Codes (by Klein, Ben-Nissan; [link](https://pdfs.semanticscholar.org/62de/373af61cc71854f86028554a988f8a4dbe36.pdf)).
-* http://vios.dc.fi.udc.es/codes/semistatic.html
+* (S,C)-Dense Coding: An Optimized Compression Code for Natural Language Text Databases (by Brisaboa, Fariña et al.; [link](http://web.archive.org/web/20201128053549/https://users.dcc.uchile.cl/~gnavarro/ps/spire03.4.pdf)).
+* On the Usefulness of Fibonacci Compression Codes (by Klein, Ben-Nissan; [link](http://web.archive.org/web/20190225180907/http://pdfs.semanticscholar.org/62de/373af61cc71854f86028554a988f8a4dbe36.pdf)).
+* [http://vios.dc.fi.udc.es/codes/semistatic.html (archive.org)](http://web.archive.org/web/20201128053727/http://vios.dc.fi.udc.es/codes/semistatic.html)
